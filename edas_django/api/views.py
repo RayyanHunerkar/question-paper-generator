@@ -1,12 +1,10 @@
 from django.shortcuts import render
 import csv
-import pandas as pd
-from pgcopy import CopyManager
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, action
-from rawquestion.models import rawquestion
+from rest_framework.decorators import api_view
+from rawquestion.models import RawQuestion
 from .serializers import RawQuestionSerializer
 
 fs = FileSystemStorage(location='tmp/')
@@ -14,7 +12,7 @@ fs = FileSystemStorage(location='tmp/')
 @api_view(['GET'])
 def get_rawquestion(request):
     if request.method == 'GET':
-        rawquestion_list = rawquestion.objects.all()
+        rawquestion_list = RawQuestion.objects.all()
         serializer = RawQuestionSerializer(rawquestion_list, many=True)
         return Response(serializer.data)
 
@@ -33,22 +31,23 @@ def add_rawquestion(request):
     reader = csv.reader(csv_file)
     next(reader)
     rawquestion_create = []
-    for row in enumerate(reader):
-
+    for id_,row in enumerate(reader):
         (
             content, 
             difficulty, 
             unit,
+
         ) = row
+
         rawquestion_create.append(
-            rawquestion(
+            RawQuestion(
                 content=content, 
                 difficulty=difficulty, 
                 unit=unit,
             )
         )
 
-    rawquestion.objects.bulk_create(rawquestion_create)
+    RawQuestion.objects.bulk_create(rawquestion_create)
 
     return Response({"status": "success"})
 

@@ -1,9 +1,9 @@
 from rest_framework import serializers
-from rawquestion.models import rawquestion
+from rawquestion.models import RawQuestion
 
 
 class RawQuestionSerializer(serializers.ModelSerializer):
     
     class Meta:
-        model = rawquestion
+        model = RawQuestion
         fields = ('rawquestionID', 'content', 'difficulty', 'unit')
