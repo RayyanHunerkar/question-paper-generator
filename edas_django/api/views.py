@@ -55,9 +55,9 @@ class RawQuestionViewSet(viewsets.GenericViewSet,
 
 class QuestionPaperViewSet(mixins.ListModelMixin,
                         mixins.CreateModelMixin,
-                        mixins.RetrieveModelMixin, 
-                        mixins.UpdateModelMixin, 
-                        mixins.DestroyModelMixin, 
+                        mixins.RetrieveModelMixin,
+                        mixins.UpdateModelMixin,
+                        mixins.DestroyModelMixin,
                         viewsets.GenericViewSet
     ):
 
