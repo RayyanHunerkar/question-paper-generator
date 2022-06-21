@@ -32,6 +32,10 @@ class Subject(models.Model):
     courseID = models.ForeignKey(Course, on_delete=models.CASCADE)
     academicyearID = models.ForeignKey(AcademicYear, on_delete=models.CASCADE, null=False, default= 1)
 
+    def __str__(self):
+        return self.name
+
+
 class Question(models.Model):
 
     EASY = 'EASY'
@@ -64,6 +68,8 @@ class QuestionSet(models.Model):
 
     def total_marks(self):
         return self.compulsorymarks + self.optionalmarks
+
+        
 
 class QuestionPaper(models.Model):
     QuestionPaperID = models.AutoField(primary_key=True)

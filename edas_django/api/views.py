@@ -79,6 +79,14 @@ class ExportDocViewSet(viewsets.GenericViewSet):
     def list(self, request, *args, **kwargs):
         document = Document()
 
+        document.add_heading('Question Paper {}'.format(self.queryset.first().QuestionPaperID), 0)
+        document.add_paragraph('Academic Year: {}'.format(self.queryset.first().AcademicYear.__str__()))
+        document.add_paragraph('Course: {}'.format(self.queryset.first().subjectcode.name))
+        document.add_paragraph('Notes: {}'.format(self.queryset.first().exam_note.note))
+        # document.add_paragraph('Subject: {}'.format(self.queryset.first().Subject))
+        document.add_paragraph('Total Marks: {}'.format(self.queryset.first().maxmarks))
+        # document.add_paragraph('Total Questions: {}'.format(self.queryset.first().TotalQuestions))
+        
         buffer = io.BytesIO()
         document.save(buffer)
         buffer.seek(0)
@@ -88,7 +96,7 @@ class ExportDocViewSet(viewsets.GenericViewSet):
             content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
         )
 
-        response['Content-Disposition'] = 'attachment; filename={}'.format('test.docx')
+        response['Content-Disposition'] = 'attachment; filename=Question Paper {}.docx'.format(self.queryset.first().QuestionPaperID)
         response['Content-Encoding'] = 'utf-8'
         return response
 
