@@ -1,15 +1,16 @@
-from django.shortcuts import render
 import csv
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage
+from django.http import StreamingHttpResponse
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from docx import Document
+import io
 from rest_framework import mixins
+from rest_framework.views import APIView
 from rest_framework import viewsets
 from rawquestion.models import RawQuestion
 from questiongenerator.models import *
-from .serializers import RawQuestionSerializer
-from .serializers import QuestionSerializer, QuestionSetSerializer, QuestionPaperSerializer, QuestionPaperSetSerializer, AcademicYearSerializer, CourseSerializer, ExamSerializer, ExamNoteSerializer, SubjectSerializer
+from .serializers import *
 
 fs = FileSystemStorage(location='tmp/')
 
@@ -63,3 +64,32 @@ class QuestionPaperViewSet(mixins.ListModelMixin,
 
     queryset = QuestionPaper.objects.all()
     serializer_class = QuestionPaperSerializer
+
+class QuestionSetViewSet(mixins.ListModelMixin,
+                        mixins.CreateModelMixin,
+                        viewsets.GenericViewSet):
+    queryset = QuestionSet.objects.all()
+    serializer_class = QuestionSetSerializer
+
+class ExportDocViewSet(viewsets.GenericViewSet):
+
+    queryset = QuestionPaper.objects.all()
+    serializer_class = QuestionPaperSerializer
+
+    def list(self, request, *args, **kwargs):
+        document = Document()
+
+        buffer = io.BytesIO()
+        document.save(buffer)
+        buffer.seek(0)
+
+        response = StreamingHttpResponse(
+            streaming_content=buffer,
+            content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        )
+
+        response['Content-Disposition'] = 'attachment; filename={}'.format('test.docx')
+        response['Content-Encoding'] = 'utf-8'
+        return response
+
+
