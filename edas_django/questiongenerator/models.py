@@ -12,6 +12,7 @@ class AcademicYear(models.Model):
     
     def __str__(self):
         return self.year_range()
+
 class Course(models.Model):
     courseID = models.AutoField(primary_key=True)
     name = models.CharField(max_length=256)
@@ -34,7 +35,49 @@ class Subject(models.Model):
 
     def __str__(self):
         return self.name
+class QuestionPaperSet(models.Model):
+    questionPaperSetID = models.AutoField(primary_key=True)
+    paperSet = models.IntegerField()
+    # questionPaper = models.ForeignKey(QuestionPaper, on_delete=models.CASCADE)
 
+class QuestionPaper(models.Model):
+    QuestionPaperID = models.AutoField(primary_key=True)
+    maxmarks = models.IntegerField(default=100)
+    time = models.TimeField(default=datetime.time(2, 30, 0))
+    exam_note = models.ForeignKey(ExamNote, on_delete=models.CASCADE, null=True)
+    subjectcode  = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True)
+    questionpaperset = models.ForeignKey(QuestionPaperSet, on_delete=models.CASCADE, null = True, related_name='questionpaper')
+    AcademicYear = models.ForeignKey(AcademicYear, on_delete=models.CASCADE, null=False, default=1)
+    coursename = models.TextField(max_length=256)
+    semester = models.IntegerField()
+
+    class Meta:
+        unique_together = ('QuestionPaperID', 'subjectcode')
+        ordering = ['QuestionPaperID']
+    
+    def __str__(self):
+        return str(self.QuestionPaperID)
+
+
+
+class QuestionSet(models.Model):
+
+    questionSetID = models.AutoField(primary_key=True)
+    # question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    min_questions = models.IntegerField(default=1, null=True)
+    max_questions = models.IntegerField(default=100, null=True)
+    questionpaper = models.ForeignKey(QuestionPaper, on_delete=models.CASCADE, null=True, related_name='questionset')
+    setType = models.IntegerField()
+    compulsorymarks = models.IntegerField(null=True)
+    optionalmarks = models.IntegerField(null=True)
+
+    class Meta:
+        ordering = ['questionSetID']
+    def totalquestions(self):
+        return self.min_questions + self.max_questions
+
+    def total_marks(self):
+        return self.compulsorymarks + self.optionalmarks
 
 class Question(models.Model):
 
@@ -52,45 +95,10 @@ class Question(models.Model):
     unit = models.IntegerField()
     marks = models.IntegerField(default=0)
     subjectID = models.ForeignKey(Subject, on_delete=models.CASCADE, null = True)
-
-class QuestionSet(models.Model):
-
-    questionSetID = models.AutoField(primary_key=True)
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    min_questions = models.IntegerField(default=1, null=True)
-    max_questions = models.IntegerField(default=100, null=True)
-    setType = models.IntegerField()
-    compulsorymarks = models.IntegerField(null=True)
-    optionalmarks = models.IntegerField(null=True)
-
-    def totalquestions(self):
-        return self.min_questions + self.max_questions
-
-    def total_marks(self):
-        return self.compulsorymarks + self.optionalmarks
-
-        
-
-class QuestionPaper(models.Model):
-    QuestionPaperID = models.AutoField(primary_key=True)
-    maxmarks = models.IntegerField(default=100)
-    time = models.TimeField(default=datetime.time(2, 30, 0))
-    exam_note = models.ForeignKey(ExamNote, on_delete=models.CASCADE, null=True)
-    subjectcode  = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True)
-    QuestionSet = models.ForeignKey(QuestionSet, on_delete=models.CASCADE) # Should this store the setIDs as a list? 
-    AcademicYear = models.ForeignKey(AcademicYear, on_delete=models.CASCADE, null=False, default=1)
-    coursename = models.TextField(max_length=256)
-    semester = models.IntegerField()
+    questionset = models.ForeignKey(QuestionSet, on_delete=models.CASCADE, null = True,related_name='question')
 
     def __str__(self):
-        return str(self.QuestionPaperID)
-    
-
-class QuestionPaperSet(models.Model):
-    questionPaperSetID = models.AutoField(primary_key=True)
-    paperSet = models.IntegerField()
-    questionPaper = models.ForeignKey(QuestionPaper, on_delete=models.CASCADE)
-
+        return str(self.questionset)
 class QuestionTypeDescriptor(models.Model):
     quesitiontypedescriptorID = models.AutoField(primary_key=True)
     code_value = models.IntegerField()
@@ -102,4 +110,3 @@ class SemesterDescriptor(models.Model):
     code_value = models.IntegerField()
     short_desc = models.CharField(max_length=256)
     description = models.CharField(max_length=1024)
-
