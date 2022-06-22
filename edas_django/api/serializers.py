@@ -16,22 +16,11 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 class QuestionSetSerializer(serializers.ModelSerializer):
         
+        question = QuestionSerializer()
         class Meta:
             model = QuestionSet
             fields = '__all__'
-
-class QuestionPaperSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = QuestionPaper
-        fields = '__all__'
-
-class QuestionPaperSetSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = QuestionPaperSet
-        fields = '__all__'
-
+            
 class AcademicYearSerializer(serializers.ModelSerializer):
     
     class Meta:
@@ -72,4 +61,21 @@ class SemesterDescriptorSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = SemesterDescriptor
+        fields = '__all__'
+
+class QuestionPaperSerializer(serializers.ModelSerializer):
+    QuestionSet = QuestionSetSerializer()
+    AcademicYear = AcademicYearSerializer()
+    subjectcode = SubjectSerializer()
+
+
+    class Meta:
+        model = QuestionPaper
+        fields ='__all__'
+
+
+class QuestionPaperSetSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = QuestionPaperSet
         fields = '__all__'
