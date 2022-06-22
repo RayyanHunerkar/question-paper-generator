@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from docx import Document
 import io
 from rest_framework import mixins
-from rest_framework.views import APIView
+# from rest_framework.views import APIView
 from rest_framework import viewsets
 from rawquestion.models import RawQuestion
 from questiongenerator.models import *
@@ -73,19 +73,28 @@ class QuestionSetViewSet(mixins.ListModelMixin,
 
 class ExportDocViewSet(viewsets.GenericViewSet):
 
-    queryset = QuestionPaper.objects.all()
-    serializer_class = QuestionPaperSerializer
+    questionpaperqueryset = QuestionPaper.objects.all()
+    questionsetqueryset = QuestionSet.objects.all()
+    questionqueryset = Question.objects.all()
+    # serializer_class = QuestionPaperSerializer
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request):
         document = Document()
 
-        document.add_heading('Question Paper {}'.format(self.queryset.first().QuestionPaperID), 0)
-        document.add_paragraph('Academic Year: {}'.format(self.queryset.first().AcademicYear.__str__()))
-        document.add_paragraph('Course: {}'.format(self.queryset.first().subjectcode.name))
-        document.add_paragraph('Notes: {}'.format(self.queryset.first().exam_note.note))
-        # document.add_paragraph('Subject: {}'.format(self.queryset.first().Subject))
-        document.add_paragraph('Total Marks: {}'.format(self.queryset.first().maxmarks))
-        # document.add_paragraph('Total Questions: {}'.format(self.queryset.first().TotalQuestions))
+        document.add_heading('Question Paper {}'.format(self.questionpaperqueryset.first().QuestionPaperID), 0)
+        document.add_paragraph('Academic Year: {}'.format(self.questionpaperqueryset.first().AcademicYear.__str__()))
+        document.add_paragraph('Course: {}'.format(self.questionpaperqueryset.first().subjectcode.name))
+        document.add_paragraph('Notes: {}'.format(self.questionpaperqueryset.first().exam_note.note))
+        document.add_paragraph('Total Marks: {}'.format(self.questionpaperqueryset.first().maxmarks))
+        
+        for questionset in self.questionsetqueryset.all():
+            document.add_paragraph('Question Set: {}'.format(questionset.setType))
+            for question in self.questionqueryset.all():
+                    if question.questionset == questionset:
+                        document.add_paragraph('Question: {}'.format(question.content))
+                    # document.add_paragraph(question.content)
+
+
         
         buffer = io.BytesIO()
         document.save(buffer)
@@ -96,8 +105,6 @@ class ExportDocViewSet(viewsets.GenericViewSet):
             content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
         )
 
-        response['Content-Disposition'] = 'attachment; filename=Question Paper {}.docx'.format(self.queryset.first().QuestionPaperID)
+        response['Content-Disposition'] = 'attachment; filename=Question Paper {}.docx'.format(self.questionpaperqueryset.first().QuestionPaperID)
         response['Content-Encoding'] = 'utf-8'
         return response
-
-
