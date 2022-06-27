@@ -13,7 +13,7 @@ schema_view = get_schema_view(
       description="API Documentation for the base Question Paper Generator",
       terms_of_service="https://www.google.com/policies/terms/",
       contact=openapi.Contact(email="rayyan.hunerkar@sparkeighteen.com"),
-      license=openapi.License(name="BSD License"),
+      license=openapi.License(name=""),
    ),
    public=True,
    permission_classes=[permissions.AllowAny],
@@ -22,10 +22,9 @@ schema_view = get_schema_view(
 urlpatterns = [
    path('admin/', admin.site.urls),
    path('api/v1/', include('api.urls')),
+
     # swagger UI url
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-   # path('cached/swagger/', schema_view.with_ui('swagger', cache_timeout=None), name='cschema-swagger-ui'),
-   # path('cached/redoc/', schema_view.with_ui('redoc', cache_timeout=None), name='cschema-redoc'),
 
 ]

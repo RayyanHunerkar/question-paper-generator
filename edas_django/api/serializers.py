@@ -10,7 +10,6 @@ class RawQuestionSerializer(serializers.ModelSerializer):
 
 class QuestionSerializer(serializers.ModelSerializer):
     
-
     class Meta:
         model = Question
         fields = '__all__'
@@ -66,15 +65,12 @@ class SemesterDescriptorSerializer(serializers.ModelSerializer):
 
 class QuestionPaperSerializer(serializers.ModelSerializer):
     questionset = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    AcademicYear = AcademicYearSerializer()
-    subjectcode = SubjectSerializer()
-
+    AcademicYear = AcademicYearSerializer(read_only=True)
+    subjectcode = SubjectSerializer(read_only=True)
 
     class Meta:
         model = QuestionPaper
         fields = ['QuestionPaperID','maxmarks','time','exam_note','subjectcode','AcademicYear','coursename','semester','questionset']
-        
-
 
 class QuestionPaperSetSerializer(serializers.ModelSerializer):
     

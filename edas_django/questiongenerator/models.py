@@ -38,8 +38,7 @@ class Subject(models.Model):
 class QuestionPaperSet(models.Model):
     questionPaperSetID = models.AutoField(primary_key=True)
     paperSet = models.IntegerField()
-    # questionPaper = models.ForeignKey(QuestionPaper, on_delete=models.CASCADE)
-
+    
 class QuestionPaper(models.Model):
     QuestionPaperID = models.AutoField(primary_key=True)
     maxmarks = models.IntegerField(default=100)
@@ -52,13 +51,10 @@ class QuestionPaper(models.Model):
     semester = models.IntegerField()
 
     class Meta:
-        unique_together = ('QuestionPaperID', 'subjectcode')
         ordering = ['QuestionPaperID']
     
     def __str__(self):
         return str(self.QuestionPaperID)
-
-
 
 class QuestionSet(models.Model):
 

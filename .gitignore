@@ -133,3 +133,6 @@ dmypy.json
 # tmp files
 tmp/
 
+# idea files
+.idea/
+
